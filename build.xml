@@ -1,20 +1,31 @@
 <?xml version="1.0"?>   
 <project name="java-junit-template-project" default="test" basedir=".">
-  <!-- build all classes in this directory -->
-  
-  <property name="tst-dir" value="test" />
+  <property name="main.build.dir" value="build/main" />  
+  <property name="main.src.dir" value="src" />
+  <property name="test.build.dir" value="build/test" />
+  <property name="test.src.dir" value="test" />
+
   <path id="classpath.base" />
 
   <path id="classpath.test">
     <pathelement location="lib/junit-4.11.jar" />
-    <pathelement location="${tst-dir}" />
+    <pathelement location="lib/hamcrest-core-1.3.jar" />
+    <pathelement location="${main.build.dir}"/>
     <path refid="classpath.base" />
   </path>
 
   <target name="test" depends="run, clean" />
 
-  <target name="build">
-    <javac srcdir="${basedir}" includeantruntime="false">
+  <target name="compile">
+    <mkdir dir="${main.build.dir}"/>
+    <javac srcdir="${main.src.dir}" destdir="${main.build.dir}" includeantruntime="false">
+      <classpath refid="classpath.base"/>
+    </javac>
+  </target>
+
+  <target name="build" depends="compile">
+    <mkdir dir="${test.build.dir}"/>
+    <javac srcdir="${test.src.dir}" destdir="${test.build.dir}" includeantruntime="false">
         <classpath refid="classpath.test"/>
     </javac>
     <echo message="Build done" />
@@ -24,10 +35,13 @@
   <!-- To run this: use "ant" (default) or "ant run" -->
   <target name="run" depends="build">
     <junit printsummary="on" haltonfailure="yes" failureProperty="test.failure">
-        <classpath refid="classpath.test" />
+        <classpath>
+          <path refid="classpath.test" />
+          <pathelement location="${test.build.dir}"/>
+        </classpath>
         <formatter type="brief" usefile="false" />
         <batchtest>
-            <fileset dir="${tst-dir}" includes="**/Test*.class" />
+            <fileset dir="${test.src.dir}" includes="**/*Test*.java" />
         </batchtest>
     </junit>
     <fail message="test failed" if="test.failure" />
