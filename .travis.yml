@@ -3,3 +3,5 @@ jdk:
   - oraclejdk7
   - openjdk7
   - openjdk6
+before_install:
+  - export JAVA_HOME=/usr/lib/jvm/java-8-oracle
